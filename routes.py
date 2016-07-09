@@ -1,4 +1,4 @@
-from views import MainView, LoginView, SignInView, LogOutView, AddVisitorView
+from views import MainView, LoginView, SignInView, LogOutView, AddVisitorView, RemoveVisitorView
 
 routes = [
     ('GET', '/', MainView, 'main'),
@@ -6,4 +6,5 @@ routes = [
     ('*', '/logout', LogOutView, 'logout'),
     ('*', '/sign', SignInView, 'sign'),
     ('*', '/add_visitor', AddVisitorView, 'add_visitor'),
+    ('*', '/remove_visitor', RemoveVisitorView, 'remove_visitor'),
 ]

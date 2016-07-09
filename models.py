@@ -28,8 +28,8 @@ class User(BaseModel):
 
 class Shift(BaseModel):
     user = peewee.ForeignKeyField(User, related_name='shifts')
-    time_opened = peewee.DateTimeField()
-    time_close = peewee.DateTimeField()
+    time_opened = peewee.DoubleField()
+    time_close = peewee.DoubleField()
     nominal_cash = peewee.DoubleField()
     real_cash = peewee.DoubleField()
     income = peewee.DoubleField()
@@ -39,8 +39,8 @@ class Shift(BaseModel):
 
 class Visitor(BaseModel):
     name = peewee.CharField()
-    time_in = peewee.DateTimeField()
-    time_out = peewee.DateTimeField()
+    time_in = peewee.DoubleField()
+    time_out = peewee.DoubleField()
     time_delta = peewee.DoubleField()
     price = peewee.DoubleField()
     paid = peewee.DoubleField()
@@ -48,9 +48,9 @@ class Visitor(BaseModel):
 
 def drop_tables():
     db.connect()
-    User.drop_table(fail_silently=True)
-    Shift.drop_table(fail_silently=True)
-    Visitor.drop_table(fail_silently=True)
+    User.drop_table(fail_silently=True, cascade=True)
+    Shift.drop_table(fail_silently=True, cascade=True)
+    Visitor.drop_table(fail_silently=True, cascade=True)
     db.close()
 
 

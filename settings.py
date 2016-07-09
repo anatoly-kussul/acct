@@ -9,3 +9,6 @@ DB_NAME = 'aact'
 DB_USER = 'postgres'
 DB_PASSWORD = 'njirf5'
 DB_HOST = 'localhost'
+
+# APP settings
+HOUR_PRICE = 15  # UAH

@@ -1,13 +1,16 @@
 from hashlib import md5
 import json
 import time
+import uuid
+from operator import itemgetter
 
 from aiohttp import web
 import aiohttp_jinja2
 from aiohttp_session import get_session
 from peewee import IntegrityError
 
-from models import User
+from models import User, Visitor
+import settings
 
 
 def redirect(request, router_name):
@@ -39,7 +42,7 @@ class MainView(web.View):
             'data': 'Hello Kitty ^_^',
             'username': session.get('username'),
             'is_admin': session.get('is_admin'),
-            'visitors': self.request.app['visitors'],
+            'visitors': sorted(self.request.app['visitors'].values(), key=itemgetter('time_in')),
         }
 
 
@@ -109,9 +112,39 @@ class AddVisitorView(web.View):
 
     async def post(self):
         data = await self.request.post()
+        _id = str(uuid.uuid4())
         visitor = {
+            'id': _id,
             'name': data['name'],
             'time_in': time.time(),
         }
-        self.request.app['visitors'].append(visitor)
+        self.request.app['visitors'][_id] = visitor
+        redirect(self.request, 'main')
+
+
+class RemoveVisitorView(web.View):
+    @aiohttp_jinja2.template('remove_visitor.html')
+    async def get(self):
+        data = self.request.GET
+        visitor_id = data['id']
+        visitor = self.request.app['visitors'].get(visitor_id)
+        if visitor is None:
+            redirect(self.request, 'main')
+        visitor['time_out'] = time.time()
+        visitor['time_delta'] = visitor['time_out'] - visitor['time_in']
+        visitor['price'] = int(visitor['time_delta']/3600 * settings.HOUR_PRICE * 2)/2
+        return visitor
+
+    async def post(self):
+        data = await self.request.post()
+        visitor_id = data['id']
+        visitor = self.request.app['visitors'].pop(visitor_id, None)
+        if visitor is None:
+            return web.Response(
+                content_type='application/json',
+                text=json.dumps({'error': 'There is no visitor with such id'})
+            )
+        visitor.pop('id')
+        visitor['paid'] = float(data['paid'])
+        Visitor.create(**visitor)
         redirect(self.request, 'main')

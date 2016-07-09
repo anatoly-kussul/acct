@@ -36,7 +36,7 @@ def init_app(loop=None):
         app.router.add_route(route[0], route[1], route[2], name=route[3])
     app.router.add_static('/static', settings.STATIC_PATH, name='static')
 
-    app['visitors'] = []
+    app['visitors'] = {}
 
     aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(settings.TEMPLATES_PATH))
     return app
@@ -46,9 +46,9 @@ def main():
     loop = asyncio.get_event_loop()
     args = parse_args()
     setup_logging(args.debug)
-    create_tables()
     if args.drop:
         drop_tables()
+    create_tables()
     app = init_app(loop=loop)
     logging.info('Starting app on port {}...'.format(settings.PORT))
     web.run_app(app, port=settings.PORT)

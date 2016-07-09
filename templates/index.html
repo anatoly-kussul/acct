@@ -11,7 +11,7 @@ Main Page
 {{ username }} is on duty<br>
 VISITORS:<br>
 {% for visitor in visitors %}
-<li>{{ visitor.name }} - {{ visitor.time_in }}</li>
+<li>{{ visitor.name }} - {{ visitor.time_in }} <a href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></li>
 {% endfor %}
 <br><br><br>
 <a href="/add_visitor">Add visitor</a><br>
