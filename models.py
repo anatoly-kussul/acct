@@ -1,3 +1,6 @@
+from hashlib import md5
+import logging
+
 import peewee
 
 import settings
@@ -43,6 +46,18 @@ class Visitor(BaseModel):
     paid = peewee.DoubleField()
 
 
+def drop_tables():
+    db.connect()
+    User.drop_table(fail_silently=True)
+    Shift.drop_table(fail_silently=True)
+    Visitor.drop_table(fail_silently=True)
+    db.close()
+
+
 def create_tables():
     db.connect()
     db.create_tables([User, Shift, Visitor], safe=True)
+    try:
+        User.create(username='admin', password=md5('admin'.encode('utf-8')).hexdigest(), is_admin=True)
+    except peewee.IntegrityError:
+        logging.debug('admin user already exists')

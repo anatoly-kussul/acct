@@ -8,7 +8,17 @@ Main Page
 {% endblock %}
 
 {% block content %}
-{{ data }}
+{{ username }} is on duty<br>
+VISITORS:<br>
+{% for visitor in visitors %}
+<li>{{ visitor.name }} - {{ visitor.time_in }}</li>
+{% endfor %}
+<br><br><br>
+<a href="/add_visitor">Add visitor</a><br>
+{% if is_admin %}
+<a href="/sign">Add operator</a><br>
+{% endif %}
+<a href="/logout">Log out</a>
 {% endblock %}
 
 {% block footer %}

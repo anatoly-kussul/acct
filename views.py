@@ -1,5 +1,6 @@
 from hashlib import md5
 import json
+import time
 
 from aiohttp import web
 import aiohttp_jinja2
@@ -32,8 +33,14 @@ def hash_password(password):
 
 class MainView(web.View):
     @aiohttp_jinja2.template('index.html')
-    def get(self):
-        return {'data': 'Hello Kitty ^_^'}
+    async def get(self):
+        session = await get_session(self.request)
+        return {
+            'data': 'Hello Kitty ^_^',
+            'username': session.get('username'),
+            'is_admin': session.get('is_admin'),
+            'visitors': self.request.app['visitors'],
+        }
 
 
 class LoginView(web.View):
@@ -93,3 +100,18 @@ class LogOutView(web.View):
     async def get(self):
         session = await get_session(self.request)
         end_session(session, self.request)
+
+
+class AddVisitorView(web.View):
+    @aiohttp_jinja2.template('add_visitor.html')
+    async def get(self):
+        return {}
+
+    async def post(self):
+        data = await self.request.post()
+        visitor = {
+            'name': data['name'],
+            'time_in': time.time(),
+        }
+        self.request.app['visitors'].append(visitor)
+        redirect(self.request, 'main')
