@@ -10,6 +10,8 @@ import jinja2
 
 from setup_logging import setup_logging
 from routes import routes
+from models import create_tables
+from middlewares import authorize
 import settings
 
 
@@ -24,9 +26,11 @@ def main():
     loop = asyncio.get_event_loop()
     args = parse_args()
     setup_logging(args.debug)
+    create_tables()
     app = web.Application(
         middlewares=[
             session_middleware(EncryptedCookieStorage(settings.SECRET_KEY)),
+            authorize,
         ],
         loop=loop
     )
