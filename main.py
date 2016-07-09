@@ -36,10 +36,7 @@ def main():
     aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(settings.TEMPLATES_PATH))
 
     logging.info('Starting app on port {}...'.format(settings.PORT))
-    try:
-        web.run_app(app, port=settings.PORT)
-    except KeyboardInterrupt:
-        logging.info('Shutting down due to KeyboardInterrupt...')
+    web.run_app(app, port=settings.PORT)
     logging.info('Stopped.')
 
 
