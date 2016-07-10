@@ -1,8 +1,12 @@
+from hashlib import md5
+import logging
+
+import peewee_async
 import peewee
 
 import settings
 
-db = peewee.PostgresqlDatabase(
+db = peewee_async.PostgresqlDatabase(
     settings.DB_NAME,
     user=settings.DB_USER,
     password=settings.DB_PASSWORD,
@@ -25,8 +29,8 @@ class User(BaseModel):
 
 class Shift(BaseModel):
     user = peewee.ForeignKeyField(User, related_name='shifts')
-    time_opened = peewee.DateTimeField()
-    time_close = peewee.DateTimeField()
+    time_opened = peewee.DoubleField()
+    time_close = peewee.DoubleField()
     nominal_cash = peewee.DoubleField()
     real_cash = peewee.DoubleField()
     income = peewee.DoubleField()
@@ -35,14 +39,48 @@ class Shift(BaseModel):
 
 
 class Visitor(BaseModel):
+    shift = peewee.ForeignKeyField(Shift, related_name='visitors')
     name = peewee.CharField()
-    time_in = peewee.DateTimeField()
-    time_out = peewee.DateTimeField()
+    time_in = peewee.DoubleField()
+    time_out = peewee.DoubleField()
     time_delta = peewee.DoubleField()
     price = peewee.DoubleField()
     paid = peewee.DoubleField()
 
 
+class Discharge(BaseModel):
+    shift = peewee.ForeignKeyField(Shift, related_name='discharges')
+    amount = peewee.FloatField()
+    time = peewee.FloatField()
+    reason = peewee.TextField()
+
+
+def drop_tables():
+    db.connect()
+    User.drop_table(fail_silently=True, cascade=True)
+    Shift.drop_table(fail_silently=True, cascade=True)
+    Visitor.drop_table(fail_silently=True, cascade=True)
+    Discharge.drop_table(fail_silently=True, cascade=True)
+    db.close()
+
+
 def create_tables():
     db.connect()
-    db.create_tables([User, Shift, Visitor], safe=True)
+    db.create_tables([User, Shift, Visitor, Discharge], safe=True)
+
+
+def add_fixtures():
+    try:
+        User.create(username='admin', password=md5('admin'.encode('utf-8')).hexdigest(), is_admin=True)
+    except peewee.IntegrityError:
+        logging.debug('admin user already exists')
+
+
+def init_db(drop=False):
+    if drop:
+        drop_tables()
+    create_tables()
+    add_fixtures()
+    async_db = peewee_async.Manager(db)
+    async_db.allow_sync = False
+    return async_db

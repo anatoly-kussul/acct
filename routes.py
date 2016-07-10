@@ -1,8 +1,21 @@
-from views import MainView, LoginView, SignInView, LogOutView
+from views import (
+    MainView,
+    LoginView,
+    SignInView,
+    CloseShiftView,
+    AddVisitorView,
+    RemoveVisitorView,
+    DischargeView,
+    StaticsView,
+)
 
 routes = [
     ('GET', '/', MainView, 'main'),
     ('*', '/login', LoginView, 'login'),
-    ('*', '/logout', LogOutView, 'logout'),
+    ('*', '/close_shift', CloseShiftView, 'logout'),
     ('*', '/sign', SignInView, 'sign'),
+    ('*', '/add_visitor', AddVisitorView, 'add_visitor'),
+    ('*', '/remove_visitor', RemoveVisitorView, 'remove_visitor'),
+    ('*', '/discharge', DischargeView, 'discharge'),
+    ('*', '/statistics', StaticsView, 'statistics'),
 ]
