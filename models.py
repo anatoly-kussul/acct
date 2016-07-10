@@ -39,6 +39,7 @@ class Shift(BaseModel):
 
 
 class Visitor(BaseModel):
+    shift = peewee.ForeignKeyField(Shift, related_name='visitors')
     name = peewee.CharField()
     time_in = peewee.DoubleField()
     time_out = peewee.DoubleField()
@@ -47,17 +48,25 @@ class Visitor(BaseModel):
     paid = peewee.DoubleField()
 
 
+class Discharge(BaseModel):
+    shift = peewee.ForeignKeyField(Shift, related_name='discharges')
+    amount = peewee.FloatField()
+    time = peewee.FloatField()
+    reason = peewee.TextField()
+
+
 def drop_tables():
     db.connect()
     User.drop_table(fail_silently=True, cascade=True)
     Shift.drop_table(fail_silently=True, cascade=True)
     Visitor.drop_table(fail_silently=True, cascade=True)
+    Discharge.drop_table(fail_silently=True, cascade=True)
     db.close()
 
 
 def create_tables():
     db.connect()
-    db.create_tables([User, Shift, Visitor], safe=True)
+    db.create_tables([User, Shift, Visitor, Discharge], safe=True)
 
 
 def add_fixtures():

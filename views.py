@@ -8,8 +8,9 @@ from aiohttp import web
 import aiohttp_jinja2
 from peewee import IntegrityError
 
-from models import User, Visitor
+from models import User
 import settings
+from shift import close_shift, open_shift
 
 
 def redirect(request, router_name):
@@ -19,6 +20,13 @@ def redirect(request, router_name):
 
 def hash_password(password):
     return md5(password.encode('utf-8')).hexdigest()
+
+
+def logout(request):
+    del request.app['user_id']
+    del request.app['username']
+    del request.app['is_admin']
+    redirect(request, 'login')
 
 
 class BaseView(web.View):
@@ -63,10 +71,11 @@ class LoginView(BaseView):
                 content_type='application/json',
                 text=json.dumps({'error': 'Wrong username or password'})
             )
-        else:
-            self.app['username'] = user.username
-            self.app['is_admin'] = user.is_admin
-            redirect(self.request, 'main')
+        self.app['user_id'] = user.id
+        self.app['username'] = user.username
+        self.app['is_admin'] = user.is_admin
+        self.app['shift'] = open_shift(cash=self.app['cash'])
+        redirect(self.request, 'main')
 
 
 class SignInView(BaseView):
@@ -94,13 +103,6 @@ class SignInView(BaseView):
             content_type='application/json',
             text=json.dumps({'data': 'User successfully registered'})
         )
-
-
-class LogOutView(BaseView):
-    async def get(self):
-        del self.app['username']
-        del self.app['is_admin']
-        redirect(self.request, 'login')
 
 
 class AddVisitorView(BaseView):
@@ -144,8 +146,10 @@ class RemoveVisitorView(BaseView):
             )
         visitor.pop('id')
         visitor['paid'] = float(data['paid'])
-        await self.db.create(Visitor, **visitor)
-        self.app['shift']['cash'] += visitor['paid']
+        self.app['shift']['left_visitors'].append(visitor)
+        self.app['shift']['nominal_cash'] += visitor['paid']
+        self.app['shift']['income'] += visitor['paid']
+        self.app['shift']['profit'] += visitor['paid']
         redirect(self.request, 'main')
 
 
@@ -156,11 +160,28 @@ class DischargeView(BaseView):
 
     async def post(self):
         data = await self.request.post()
-        self.app['shift']['cash'] -= float(data['amount'])
+        amount = float(data['amount'])
+        self.app['shift']['nominal_cash'] -= amount
+        self.app['shift']['outcome'] += amount
+        self.app['shift']['profit'] -= amount
         discharge = {
             'time': time.time(),
-            'amount': data['amount'],
+            'amount': amount,
             'reason': data['reason'],
         }
         self.app['shift']['discharges'].append(discharge)
         redirect(self.request, 'main')
+
+
+class CloseShiftView(BaseView):
+    @aiohttp_jinja2.template('close_shift.html')
+    async def get(self):
+        return {'shift': self.app['shift']}
+
+    async def post(self):
+        data = await self.request.post()
+        self.app['shift']['real_cash'] = data['real_cash']
+        self.app['shift']['user'] = self.app['user_id']
+        self.app['cash'] = data['real_cash']
+        await close_shift(self.app['shift'], self.db)
+        logout(self.request)

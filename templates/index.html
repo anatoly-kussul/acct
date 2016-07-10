@@ -9,7 +9,7 @@ Main Page
 
 {% block content %}
 {{ username }} is on duty<br>
-current cash: {{ shift.cash }}<br>
+current cash: {{ shift.nominal_cash }}<br>
 VISITORS {{ visitors|count }}:<br>
 {% for visitor in visitors %}
 <li>{{ visitor.name }} - {{ visitor.time_in }} <a href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></li>
@@ -20,7 +20,7 @@ VISITORS {{ visitors|count }}:<br>
 {% if is_admin %}
 <a href="/sign">Add operator</a><br>
 {% endif %}
-<a href="/logout">Log out</a>
+<a href="/close_shift">Close shift</a>
 {% endblock %}
 
 {% block footer %}

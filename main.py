@@ -39,7 +39,8 @@ def init_app(db, loop=None):
 
     app['db'] = db
     app['visitors'] = {}
-    app['shift'] = open_shift()
+    app['cash'] = 0
+    app['shift'] = open_shift(cash=app['cash'])
 
     aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(settings.TEMPLATES_PATH))
     return app
