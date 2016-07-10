@@ -6,6 +6,7 @@ from views import (
     AddVisitorView,
     RemoveVisitorView,
     DischargeView,
+    StaticsView,
 )
 
 routes = [
@@ -16,4 +17,5 @@ routes = [
     ('*', '/add_visitor', AddVisitorView, 'add_visitor'),
     ('*', '/remove_visitor', RemoveVisitorView, 'remove_visitor'),
     ('*', '/discharge', DischargeView, 'discharge'),
+    ('*', '/statistics', StaticsView, 'statistics'),
 ]

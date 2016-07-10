@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Main Page
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+SHIFTS {{ shifts|count }}:<br>
+{% for shift in shifts %}
+shift - {{ shift.username }} | {{ shift.nominal_cash }}<br>
+    {% for visitor in shift.visitors_left %}
+    visitor - {{ visitor.name }} | {{ visitor.paid }}<br>
+    {% endfor %}
+{% endfor %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

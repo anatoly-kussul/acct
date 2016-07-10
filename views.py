@@ -8,9 +8,9 @@ from aiohttp import web
 import aiohttp_jinja2
 from peewee import IntegrityError
 
-from models import User
+from models import User, Shift
 import settings
-from shift import close_shift, open_shift
+from shift import close_shift, open_shift, shift_db_to_dict
 
 
 def redirect(request, router_name):
@@ -86,6 +86,8 @@ class SignInView(BaseView):
         return {'data': 'Please enter your data'}
 
     async def post(self):
+        if not self.app.get('is_admin'):
+            redirect(self.request, 'main')
         data = await self.request.post()
         try:
             user_data = {
@@ -185,3 +187,15 @@ class CloseShiftView(BaseView):
         self.app['cash'] = data['real_cash']
         await close_shift(self.app['shift'], self.db)
         logout(self.request)
+
+
+class StaticsView(BaseView):
+    @aiohttp_jinja2.template('statistics.html')
+    async def get(self):
+        if not self.app.get('is_admin'):
+            redirect(self.request, 'main')
+        shifts = []
+        shifts_db = await self.db.execute(Shift.select())
+        for shift_db in shifts_db:
+            shifts.append(await shift_db_to_dict(shift_db, self.db))
+        return {'shifts': shifts}
