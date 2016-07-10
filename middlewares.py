@@ -10,8 +10,7 @@ async def authorize(app, handler):
                     result = False
             return result
 
-        session = await get_session(request)
-        if session.get("username"):
+        if app.get("username"):
             return await handler(request)
         elif check_path(request.path):
             url = request.app.router['login'].url()

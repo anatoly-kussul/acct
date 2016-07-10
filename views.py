@@ -6,7 +6,6 @@ from operator import itemgetter
 
 from aiohttp import web
 import aiohttp_jinja2
-from aiohttp_session import get_session
 from peewee import IntegrityError
 
 from models import User, Visitor
@@ -18,46 +17,44 @@ def redirect(request, router_name):
     raise web.HTTPFound(url)
 
 
-def set_session(session, user, request):
-    session['username'] = user.username
-    session['is_admin'] = user.is_admin
-    redirect(request, 'main')
-
-
-def end_session(session, request):
-    del session['username']
-    del session['is_admin']
-    redirect(request, 'login')
-
-
 def hash_password(password):
     return md5(password.encode('utf-8')).hexdigest()
 
 
-class MainView(web.View):
+class BaseView(web.View):
+    @property
+    def app(self):
+        return self.request.app
+
+    @property
+    def db(self):
+        return self.request.app.get('db')
+
+
+class MainView(BaseView):
     @aiohttp_jinja2.template('index.html')
     async def get(self):
-        session = await get_session(self.request)
         return {
             'data': 'Hello Kitty ^_^',
-            'username': session.get('username'),
-            'is_admin': session.get('is_admin'),
-            'visitors': sorted(self.request.app['visitors'].values(), key=itemgetter('time_in')),
+            'username': self.app['username'],
+            'is_admin': self.app['is_admin'],
+            'shift': self.app['shift'],
+            'visitors': sorted(self.app['visitors'].values(), key=itemgetter('time_in')),
         }
 
 
-class LoginView(web.View):
+class LoginView(BaseView):
     @aiohttp_jinja2.template('login.html')
     async def get(self):
-        session = await get_session(self.request)
-        if session.get('username'):
+        if self.app.get('username'):
             redirect(self.request, 'main')
         return {'data': 'Please enter your login'}
 
     async def post(self):
         data = await self.request.post()
         try:
-            user = User.get(
+            user = await self.db.get(
+                User,
                 username=data['username'],
                 password=hash_password(data['password']),
             )
@@ -67,15 +64,15 @@ class LoginView(web.View):
                 text=json.dumps({'error': 'Wrong username or password'})
             )
         else:
-            session = await get_session(self.request)
-            set_session(session, user, self.request)
+            self.app['username'] = user.username
+            self.app['is_admin'] = user.is_admin
+            redirect(self.request, 'main')
 
 
-class SignInView(web.View):
+class SignInView(BaseView):
     @aiohttp_jinja2.template('sign.html')
     async def get(self):
-        session = await get_session(self.request)
-        if not session.get('is_admin'):
+        if not self.app.get('is_admin'):
             redirect(self.request, 'main')
         return {'data': 'Please enter your data'}
 
@@ -87,7 +84,7 @@ class SignInView(web.View):
                 'password': hash_password(data['password']),
                 'is_admin': data.get('is_admin', False)
             }
-            User.create(**user_data)
+            await self.db.create(User, **user_data)
         except IntegrityError:
             return web.Response(
                 content_type='application/json',
@@ -99,13 +96,14 @@ class SignInView(web.View):
         )
 
 
-class LogOutView(web.View):
+class LogOutView(BaseView):
     async def get(self):
-        session = await get_session(self.request)
-        end_session(session, self.request)
+        del self.app['username']
+        del self.app['is_admin']
+        redirect(self.request, 'login')
 
 
-class AddVisitorView(web.View):
+class AddVisitorView(BaseView):
     @aiohttp_jinja2.template('add_visitor.html')
     async def get(self):
         return {}
@@ -118,16 +116,16 @@ class AddVisitorView(web.View):
             'name': data['name'],
             'time_in': time.time(),
         }
-        self.request.app['visitors'][_id] = visitor
+        self.app['visitors'][_id] = visitor
         redirect(self.request, 'main')
 
 
-class RemoveVisitorView(web.View):
+class RemoveVisitorView(BaseView):
     @aiohttp_jinja2.template('remove_visitor.html')
     async def get(self):
         data = self.request.GET
         visitor_id = data['id']
-        visitor = self.request.app['visitors'].get(visitor_id)
+        visitor = self.app['visitors'].get(visitor_id)
         if visitor is None:
             redirect(self.request, 'main')
         visitor['time_out'] = time.time()
@@ -138,7 +136,7 @@ class RemoveVisitorView(web.View):
     async def post(self):
         data = await self.request.post()
         visitor_id = data['id']
-        visitor = self.request.app['visitors'].pop(visitor_id, None)
+        visitor = self.app['visitors'].pop(visitor_id, None)
         if visitor is None:
             return web.Response(
                 content_type='application/json',
@@ -146,5 +144,23 @@ class RemoveVisitorView(web.View):
             )
         visitor.pop('id')
         visitor['paid'] = float(data['paid'])
-        Visitor.create(**visitor)
+        await self.db.create(Visitor, **visitor)
+        self.app['shift']['cash'] += visitor['paid']
+        redirect(self.request, 'main')
+
+
+class DischargeView(BaseView):
+    @aiohttp_jinja2.template('discharge.html')
+    async def get(self):
+        return {}
+
+    async def post(self):
+        data = await self.request.post()
+        self.app['shift']['cash'] -= float(data['amount'])
+        discharge = {
+            'time': time.time(),
+            'amount': data['amount'],
+            'reason': data['reason'],
+        }
+        self.app['shift']['discharges'].append(discharge)
         redirect(self.request, 'main')

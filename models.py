@@ -1,11 +1,12 @@
 from hashlib import md5
 import logging
 
+import peewee_async
 import peewee
 
 import settings
 
-db = peewee.PostgresqlDatabase(
+db = peewee_async.PostgresqlDatabase(
     settings.DB_NAME,
     user=settings.DB_USER,
     password=settings.DB_PASSWORD,
@@ -57,7 +58,20 @@ def drop_tables():
 def create_tables():
     db.connect()
     db.create_tables([User, Shift, Visitor], safe=True)
+
+
+def add_fixtures():
     try:
         User.create(username='admin', password=md5('admin'.encode('utf-8')).hexdigest(), is_admin=True)
     except peewee.IntegrityError:
         logging.debug('admin user already exists')
+
+
+def init_db(drop=False):
+    if drop:
+        drop_tables()
+    create_tables()
+    add_fixtures()
+    async_db = peewee_async.Manager(db)
+    async_db.allow_sync = False
+    return async_db

@@ -10,8 +10,9 @@ import jinja2
 
 from setup_logging import setup_logging
 from routes import routes
-from models import create_tables, drop_tables
+from models import init_db
 from middlewares import authorize
+from shift import open_shift
 import settings
 
 
@@ -23,7 +24,7 @@ def parse_args():
     return args
 
 
-def init_app(loop=None):
+def init_app(db, loop=None):
     app = web.Application(
         middlewares=[
             session_middleware(EncryptedCookieStorage(settings.SECRET_KEY)),
@@ -36,7 +37,9 @@ def init_app(loop=None):
         app.router.add_route(route[0], route[1], route[2], name=route[3])
     app.router.add_static('/static', settings.STATIC_PATH, name='static')
 
+    app['db'] = db
     app['visitors'] = {}
+    app['shift'] = open_shift()
 
     aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(settings.TEMPLATES_PATH))
     return app
@@ -46,10 +49,8 @@ def main():
     loop = asyncio.get_event_loop()
     args = parse_args()
     setup_logging(args.debug)
-    if args.drop:
-        drop_tables()
-    create_tables()
-    app = init_app(loop=loop)
+    db = init_db(args.drop)
+    app = init_app(db, loop=loop)
     logging.info('Starting app on port {}...'.format(settings.PORT))
     web.run_app(app, port=settings.PORT)
     logging.info('Stopped.')

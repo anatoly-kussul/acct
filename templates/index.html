@@ -9,12 +9,14 @@ Main Page
 
 {% block content %}
 {{ username }} is on duty<br>
-VISITORS:<br>
+current cash: {{ shift.cash }}<br>
+VISITORS {{ visitors|count }}:<br>
 {% for visitor in visitors %}
 <li>{{ visitor.name }} - {{ visitor.time_in }} <a href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></li>
 {% endfor %}
 <br><br><br>
 <a href="/add_visitor">Add visitor</a><br>
+<a href="/discharge">Discharge</a><br>
 {% if is_admin %}
 <a href="/sign">Add operator</a><br>
 {% endif %}
