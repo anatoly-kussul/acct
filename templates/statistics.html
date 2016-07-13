@@ -11,8 +11,13 @@ Main Page
 SHIFTS {{ shifts|count }}:<br>
 {% for shift in shifts %}
 shift - {{ shift.username }} | {{ shift.nominal_cash }}<br>
+&nbsp;&nbsp;&nbsp;&nbsp; visitors:<br>
     {% for visitor in shift.visitors_left %}
-    visitor - {{ visitor.name }} | {{ visitor.paid }}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  visitor - {{ visitor.name }} | {{ visitor.paid }}<br>
+    {% endfor %}
+&nbsp;&nbsp;&nbsp;&nbsp; discharges:<br>
+    {% for discharge in shift.discharges %}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; discharge - {{ discharge.amount }} {{ discharge.reason }}<br>
     {% endfor %}
 {% endfor %}
 {% endblock %}
