@@ -8,9 +8,10 @@ from aiohttp import web
 import aiohttp_jinja2
 from peewee import IntegrityError
 
-from models import User, Shift
+from models import User
 import settings
-from shift import close_shift, open_shift, shift_db_to_dict
+from shift import close_shift, open_shift
+from db_getters import get_shifts
 
 
 def redirect(request, router_name):
@@ -47,7 +48,7 @@ class MainView(BaseView):
             'username': self.app['username'],
             'is_admin': self.app['is_admin'],
             'shift': self.app['shift'],
-            'visitors': sorted(self.app['visitors'].values(), key=itemgetter('time_in')),
+            'visitors': sorted(self.app['visitors'].values(), key=itemgetter('time_in_timestamp')),
         }
 
 
@@ -118,7 +119,7 @@ class AddVisitorView(BaseView):
         visitor = {
             'id': _id,
             'name': data['name'],
-            'time_in': time.time(),
+            'time_in_timestamp': time.time(),
         }
         self.app['visitors'][_id] = visitor
         redirect(self.request, 'main')
@@ -132,8 +133,8 @@ class RemoveVisitorView(BaseView):
         visitor = self.app['visitors'].get(visitor_id)
         if visitor is None:
             redirect(self.request, 'main')
-        visitor['time_out'] = time.time()
-        visitor['time_delta'] = visitor['time_out'] - visitor['time_in']
+        visitor['time_out_timestamp'] = time.time()
+        visitor['time_delta'] = visitor['time_out_timestamp'] - visitor['time_in_timestamp']
         visitor['price'] = int(visitor['time_delta']/3600 * settings.HOUR_PRICE * 2)/2
         return visitor
 
@@ -167,7 +168,7 @@ class DischargeView(BaseView):
         self.app['shift']['outcome'] += amount
         self.app['shift']['profit'] -= amount
         discharge = {
-            'time': time.time(),
+            'timestamp': time.time(),
             'amount': amount,
             'reason': data['reason'],
         }
@@ -195,8 +196,5 @@ class StaticsView(BaseView):
     async def get(self):
         if not self.app.get('is_admin'):
             redirect(self.request, 'main')
-        shifts = []
-        shifts_db = await self.db.execute(Shift.select())
-        for shift_db in shifts_db:
-            shifts.append(await shift_db_to_dict(shift_db, self.db))
+        shifts = await get_shifts()
         return {'shifts': shifts}

@@ -3,8 +3,6 @@ import logging
 import argparse
 
 from aiohttp import web
-from aiohttp_session import session_middleware
-from aiohttp_session.cookie_storage import EncryptedCookieStorage
 import aiohttp_jinja2
 import jinja2
 
@@ -18,16 +16,20 @@ import settings
 
 def parse_args():
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-d', '--debug', action='store_true', help='enable debug logging')
+    arg_parser.add_argument('-v', '--verbose', action='store_true', help='enable debug logging')
+    arg_parser.add_argument('-s', '--silent', action='store_true', help='show only critical logging')
     arg_parser.add_argument('--drop', action='store_true', help='drop tables before start')
     args = arg_parser.parse_args()
+
+    if args.verbose and args.silent:
+        raise RuntimeError('Can\'t use verbose and silent logging modes simultaneously')
+
     return args
 
 
 def init_app(db, loop=None):
     app = web.Application(
         middlewares=[
-            session_middleware(EncryptedCookieStorage(settings.SECRET_KEY)),
             authorize,
         ],
         loop=loop
@@ -49,11 +51,11 @@ def init_app(db, loop=None):
 def main():
     loop = asyncio.get_event_loop()
     args = parse_args()
-    setup_logging(args.debug)
+    setup_logging(verbose=args.verbose, silent=args.silent)
     db = init_db(args.drop)
     app = init_app(db, loop=loop)
     logging.info('Starting app on port {}...'.format(settings.PORT))
-    web.run_app(app, port=settings.PORT)
+    web.run_app(app, port=settings.PORT, print=lambda x: x)
     logging.info('Stopped.')
 
 

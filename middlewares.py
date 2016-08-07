@@ -1,5 +1,4 @@
 from aiohttp import web
-from aiohttp_session import get_session
 
 async def authorize(app, handler):
     async def middleware(request):

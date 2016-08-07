@@ -12,7 +12,7 @@ Main Page
 current cash: {{ shift.nominal_cash }}<br>
 VISITORS {{ visitors|count }}:<br>
 {% for visitor in visitors %}
-<li>{{ visitor.name }} - {{ visitor.time_in }} <a href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></li>
+<li>{{ visitor.name }} - {{ visitor.time_in_timestamp }} <a href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></li>
 {% endfor %}
 <br><br><br>
 <a href="/add_visitor">Add visitor</a><br>

@@ -1,24 +1,50 @@
 from hashlib import md5
 import logging
+import datetime
 
 import peewee_async
 import peewee
+from playhouse.shortcuts import model_to_dict, dict_to_model
 
 import settings
 
 db = peewee_async.PostgresqlDatabase(
-    settings.DB_NAME,
-    user=settings.DB_USER,
-    password=settings.DB_PASSWORD,
-    host=settings.DB_HOST,
     autocommit=True,
     autorollback=True,
+    **settings.POSTGRES_CONNECTION_SETTINGS
 )
+
+
+def dict_timestamp_to_datetime(data):
+    return {
+        key: datetime.datetime.fromtimestamp(value) if ('timestamp' in key and isinstance(value, float)) else value
+        for key, value in data.items()
+        }
+
+
+def dict_datetime_to_timestamp(data):
+    return {
+        key: value.timestamp() if isinstance(value, datetime.datetime) else value
+        for key, value in data.items()
+        }
 
 
 class BaseModel(peewee.Model):
     class Meta:
         database = db
+
+    def to_dict(self):
+        model_dict = model_to_dict(self, backrefs=False, recurse=False)
+        model_dict = dict_datetime_to_timestamp(model_dict)
+        for field in self._meta.sorted_fields:
+            if isinstance(field, peewee.ForeignKeyField):
+                model_dict.pop(field.name)
+        return model_dict
+
+    @classmethod
+    def from_dict(cls, data):
+        data = dict_timestamp_to_datetime(data)
+        return dict_to_model(cls, data)
 
 
 class User(BaseModel):
@@ -29,8 +55,8 @@ class User(BaseModel):
 
 class Shift(BaseModel):
     user = peewee.ForeignKeyField(User, related_name='shifts')
-    time_opened = peewee.DoubleField()
-    time_close = peewee.DoubleField()
+    time_opened_timestamp = peewee.DateTimeField(index=True)
+    time_close_timestamp = peewee.DateTimeField(index=True)
     nominal_cash = peewee.DoubleField()
     real_cash = peewee.DoubleField()
     income = peewee.DoubleField()
@@ -41,8 +67,8 @@ class Shift(BaseModel):
 class Visitor(BaseModel):
     shift = peewee.ForeignKeyField(Shift, related_name='visitors')
     name = peewee.CharField()
-    time_in = peewee.DoubleField()
-    time_out = peewee.DoubleField()
+    time_in_timestamp = peewee.DateTimeField()
+    time_out_timestamp = peewee.DateTimeField()
     time_delta = peewee.DoubleField()
     price = peewee.DoubleField()
     paid = peewee.DoubleField()
@@ -51,7 +77,7 @@ class Visitor(BaseModel):
 class Discharge(BaseModel):
     shift = peewee.ForeignKeyField(Shift, related_name='discharges')
     amount = peewee.FloatField()
-    time = peewee.FloatField()
+    timestamp = peewee.DateTimeField()
     reason = peewee.TextField()
 
 
