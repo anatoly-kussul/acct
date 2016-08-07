@@ -182,9 +182,10 @@ class CloseShiftView(BaseView):
 
     async def post(self):
         data = await self.request.post()
-        self.app['shift']['real_cash'] = data['real_cash']
+        real_cash = float(data['real_cash'])
+        self.app['shift']['real_cash'] = real_cash
         self.app['shift']['user'] = self.app['user_id']
-        self.app['cash'] = data['real_cash']
+        self.app['cash'] = real_cash
         await close_shift(self.app['shift'], self.db)
         logout(self.request)
 
