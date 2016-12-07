@@ -1,4 +1,4 @@
-from views import (
+from eblank.views import (
     MainView,
     LoginView,
     SignInView,

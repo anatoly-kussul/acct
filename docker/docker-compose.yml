@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+
+  postgres:
+    image: postgres:9.2
+    logging:
+      driver: "none"
+
+  schedule:
+#    build: .
+    image: eblank:dev
+    container_name: eblank
+    command: script/start.sh
+    environment:
+      - RUN_ARGS=${ARGS}
+    volumes:
+      - ../:/app
+    ports:
+      - "8853:8853"
+    depends_on:
+      - postgres

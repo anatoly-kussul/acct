@@ -1,0 +1,7 @@
+[Master]
+init-hook = 'import sys; sys.path.append(".")'
+max-line-length = 120
+good-names=db,e,ws,_,tb,f,maxDiff,setUpModule,tearDownModule,Null
+
+[Message control]
+disable = W1202

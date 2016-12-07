@@ -1,12 +1,12 @@
-from hashlib import md5
-import logging
 import datetime
+import logging
+from hashlib import md5
 
-import peewee_async
 import peewee
+import peewee_async
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
-import settings
+from eblank import settings
 
 db = peewee_async.PostgresqlDatabase(
     autocommit=True,

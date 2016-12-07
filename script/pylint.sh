@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+find ./ -name "*.py" ! -path "./.env*" ! -path "./web/*" ! -path "./schedule/auth/*" | xargs pylint -j 4 | tee pylint_tmp_report.txt
+rate=$(grep rated pylint_tmp_report.txt |  sed 's/\(Your code has been rated at\)\(.*\)\(\/10\)/\2/g')
+#wget -O pylint.svg "https://img.shields.io/badge/pylint-$rate-blue.svg"
+echo "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"20\"><linearGradient id=\"b\" x2=\"0\" y2=\"100%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"/><stop offset=\"1\" stop-opacity=\".1\"/></linearGradient><mask id=\"a\"><rect width=\"80\" height=\"20\" rx=\"3\" fill=\"#fff\"/></mask><g mask=\"url(#a)\"><path fill=\"#555\" d=\"M0 0h41v20H0z\"/><path fill=\"#007ec6\" d=\"M41 0h39v20H41z\"/><path fill=\"url(#b)\" d=\"M0 0h80v20H0z\"/></g><g fill=\"#fff\" text-anchor=\"middle\" font-family=\"DejaVu Sans,Verdana,Geneva,sans-serif\" font-size=\"11\"><text x=\"20.5\" y=\"15\" fill=\"#010101\" fill-opacity=\".3\">pylint</text><text x=\"20.5\" y=\"14\">pylint</text><text x=\"59.5\" y=\"15\" fill=\"#010101\" fill-opacity=\".3\">$rate</text><text x=\"59.5\" y=\"14\">$rate</text></g></svg>" > pylint.svg
+chmod 666 pylint.svg
+rm pylint_tmp_report.txt

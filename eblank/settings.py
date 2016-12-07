@@ -1,7 +1,7 @@
 # aiohttp settings
 PORT = 8853
-TEMPLATES_PATH = 'templates'
-STATIC_PATH = 'static'
+TEMPLATES_PATH = 'web/templates'
+STATIC_PATH = 'web/static'
 
 # data persistence
 SHELVE_FILENAME = 'current_state.db'
@@ -11,7 +11,7 @@ POSTGRES_CONNECTION_SETTINGS = {
     'database': 'eblank',
     'user': 'eblank',
     'password': 'i_am_password',
-    'host': 'localhost',
+    'host': 'postgres',
     'port': 5432,
 }
 

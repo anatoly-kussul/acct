@@ -2,7 +2,7 @@ from datetime import datetime
 
 from peewee_async import prefetch
 
-from models import Shift, Discharge, Visitor
+from eblank.models import Shift, Discharge, Visitor
 
 
 async def get_shifts(start_timestamp=None, end_timestamp=None, user_id=None):

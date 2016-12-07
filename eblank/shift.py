@@ -1,6 +1,6 @@
 import time
 
-from models import Shift, Visitor, Discharge, dict_timestamp_to_datetime
+from eblank.models import Shift, Visitor, Discharge, dict_timestamp_to_datetime
 
 
 def open_shift(cash=0):

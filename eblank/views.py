@@ -1,17 +1,17 @@
-from hashlib import md5
 import json
 import time
 import uuid
+from hashlib import md5
 from operator import itemgetter
 
-from aiohttp import web
 import aiohttp_jinja2
+from aiohttp import web
 from peewee import IntegrityError
 
-from models import User
-import settings
-from shift import close_shift, open_shift
-from db_getters import get_shifts
+from eblank import settings
+from eblank.db_getters import get_shifts
+from eblank.models import User
+from eblank.shift import close_shift, open_shift
 
 
 def redirect(request, router_name):
@@ -135,7 +135,7 @@ class RemoveVisitorView(BaseView):
             redirect(self.request, 'main')
         visitor['time_out_timestamp'] = time.time()
         visitor['time_delta'] = visitor['time_out_timestamp'] - visitor['time_in_timestamp']
-        visitor['price'] = int(visitor['time_delta']/3600 * settings.HOUR_PRICE * 2)/2
+        visitor['price'] = int(visitor['time_delta'] / 3600 * settings.HOUR_PRICE * 2) / 2
         return visitor
 
     async def post(self):
