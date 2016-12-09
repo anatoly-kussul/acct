@@ -3,6 +3,7 @@ import sys
 import logging
 import glob
 import os
+import signal
 
 from eblank import settings
 
@@ -57,3 +58,11 @@ def save_to_shelve(app, shelf):
         if key in app:
             shelf[key] = app[key]
     logging.info('Saved current system state.')
+
+
+def termination_handler(signum, frame):
+    raise KeyboardInterrupt("Handled signal: {}".format(signum))
+
+
+def set_termination_handler():
+    signal.signal(signal.SIGTERM, termination_handler)
