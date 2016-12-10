@@ -78,13 +78,7 @@ class LoginView(BaseView):
         redirect(self.request, 'main')
 
 
-class SignInView(BaseView):
-    @aiohttp_jinja2.template('sign.html')
-    async def get(self):
-        if not self.app.get('is_admin'):
-            redirect(self.request, 'main')
-        return {'data': 'Please enter your data'}
-
+class RegisterView(BaseView):
     async def post(self):
         if not self.app.get('is_admin'):
             redirect(self.request, 'main')
@@ -108,10 +102,6 @@ class SignInView(BaseView):
 
 
 class AddVisitorView(BaseView):
-    @aiohttp_jinja2.template('add_visitor.html')
-    async def get(self):
-        return {}
-
     async def post(self):
         data = await self.request.post()
         _id = str(uuid.uuid4())
@@ -156,10 +146,6 @@ class RemoveVisitorView(BaseView):
 
 
 class DischargeView(BaseView):
-    @aiohttp_jinja2.template('discharge.html')
-    async def get(self):
-        return {}
-
     async def post(self):
         data = await self.request.post()
         amount = float(data['amount'])

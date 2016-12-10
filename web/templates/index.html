@@ -10,10 +10,10 @@
 
 {% block content %}
     <div class="container card">
-        <a class="btn btn-primary" href="/add_visitor">Add visitor</a>
-        <a class="btn btn-primary" href="/discharge">Discharge</a>
+        <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#add-visitor-modal">Add visitor</a>
+        <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#discharge-modal">Discharge</a>
         {% if is_admin %}
-            <a class="btn btn-primary" href="/sign">Add operator</a>
+            <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#register-modal">Add operator</a>
             <a class="btn btn-primary" href="/statistics">Statistics</a>
         {% endif %}
         <a class="btn btn-primary" href="/close_shift">Close shift</a>
@@ -29,6 +29,51 @@
                 <div class="col-md-3"><a class="btn btn-danger" href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></div>
             </div>
         {% endfor %}
+    </div>
+
+    {# Add vivitor modal #}
+    <div class="modal fade" id="add-visitor-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-container card">
+                <h1>Add visitor</h1><br>
+                <form method="post" action="/add_visitor">
+                    <input type="text" name="name" placeholder="Name">
+                    <input type="submit" name="login" class="btn btn-primary" value="Add">
+                    <span class="btn-danger btn" href="#" data-toggle="modal" data-target="#add-visitor-modal">Cancel</span>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Discharge modal#}
+    <div class="modal fade" id="discharge-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-container card">
+                <h1>Discharge</h1><br>
+                <form method="post" action="/discharge">
+                    <input type="text" name="amount" placeholder="Amount">
+                    <input type="text" name="reason" placeholder="Reason">
+                    <input type="submit" name="login" class="btn btn-primary" value="Discharge">
+                    <span class="btn-danger btn" href="#" data-toggle="modal" data-target="#discharge-modal">Cancel</span>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Register modal #}
+    <div class="modal fade" id="register-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-container card">
+                <h1>Add operator</h1><br>
+                <form method="post" action="/register">
+                    <input type="text" name="username" placeholder="Username">
+                    <input type="password" name="password" placeholder="Password">
+                    <b><input type="checkbox" name="is_admin" title="Is admin">Is admin</b>
+                    <input type="submit" name="login" class="btn btn-primary" value="Register">
+                    <span class="btn-danger btn" href="#" data-toggle="modal" data-target="#register-modal">Cancel</span>
+                </form>
+            </div>
+        </div>
     </div>
 {% endblock %}
 

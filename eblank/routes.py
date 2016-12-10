@@ -1,7 +1,7 @@
 from eblank.views import (
     MainView,
     LoginView,
-    SignInView,
+    RegisterView,
     CloseShiftView,
     AddVisitorView,
     RemoveVisitorView,
@@ -13,7 +13,7 @@ routes = [
     ('GET', '/', MainView, 'main'),
     ('*', '/login', LoginView, 'login'),
     ('*', '/close_shift', CloseShiftView, 'logout'),
-    ('*', '/sign', SignInView, 'sign'),
+    ('*', '/register', RegisterView, 'register'),
     ('*', '/add_visitor', AddVisitorView, 'add_visitor'),
     ('*', '/remove_visitor', RemoveVisitorView, 'remove_visitor'),
     ('*', '/discharge', DischargeView, 'discharge'),
