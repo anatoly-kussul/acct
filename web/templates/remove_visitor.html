@@ -9,18 +9,21 @@ Remove Visitor
 
 {% block content %}
     <div class="modal-container card page">
-        <h1>E-Blank</h1><br>
+        <h1>Remove visitor</h1><br>
         <form method="post" action="">
-        <input type="text" name="id" value="{{ id }}" readonly style="display: None">
-        <p>Name <input type="text" name="name" value="{{ name }}" readonly></p>
-        <p>Time in <input type="text" name="time_in" value="{{ time_in_timestamp }}" readonly></p>
-        <p>Time out <input type="text" name="time_out" value="{{ time_out_timestamp }}" readonly></p>
-        <p>Time delta <input type="text" name="time_delta" value="{{ time_delta }}" readonly></p>
-        <p>Price <input type="text" name="price" value="{{ price }}" readonly></p>
-        <p><input type="text" name="paid" value="" placeholder="Paid"></p>
-        <p><input type="submit" class="modal-btn modal-submit" name="commit" value="Remove visitor"></p>
-        <a class="btn btn-danger" href="/">Cancel</a>
+            <input type="text" name="id" value="{{ id }}" readonly style="display: None">
+            <p>Name <input type="text" name="name" value="{{ name }}" readonly></p>
+            <p>Time in <input type="text" name="time_in" value="{{ time_in }}" readonly></p>
+            <p>Time out <input type="text" name="time_out" value="{{ time_out }}" readonly></p>
+            <p>Time delta <input type="text" name="time_delta" value="{{ time_delta_str }}" readonly></p>
+            <p>Price <input type="text" name="price" value="{{ price }}" readonly></p>
+            <p>Paid <input type="number" name="paid" value="" placeholder="Paid" autocomplete="off"></p>
+            <input type="submit" class="btn btn-primary" name="commit" value="Remove visitor">
+            <a class="btn btn-danger cancel" href="/">Cancel</a>
         </form>
+    {% if error %}
+        <div class="text-error">{{ error }}</div>
+    {% endif %}
     </div>
 {% endblock %}
 

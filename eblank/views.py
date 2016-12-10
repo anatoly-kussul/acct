@@ -3,6 +3,7 @@ import time
 import uuid
 from hashlib import md5
 from operator import itemgetter
+from datetime import datetime
 
 import aiohttp_jinja2
 from aiohttp import web
@@ -12,6 +13,7 @@ from eblank import settings
 from eblank.db_getters import get_shifts
 from eblank.models import User
 from eblank.shift import close_shift, open_shift
+from eblank.helpers import get_hms
 
 
 def redirect(request, router_name):
@@ -125,19 +127,27 @@ class RemoveVisitorView(BaseView):
         visitor['time_out_timestamp'] = time.time()
         visitor['time_delta'] = visitor['time_out_timestamp'] - visitor['time_in_timestamp']
         visitor['price'] = int(max(visitor['time_delta'] / 3600, 1) * settings.HOUR_PRICE * 2) / 2
+        visitor['time_in'] = datetime.fromtimestamp(visitor['time_in_timestamp']).strftime('%H:%M:%S %d.%m.%Y')
+        visitor['time_out'] = datetime.fromtimestamp(visitor['time_out_timestamp']).strftime('%H:%M:%S %d.%m.%Y')
+        visitor['time_delta_str'] = get_hms(visitor['time_delta'])
         return visitor
 
+    @aiohttp_jinja2.template('remove_visitor.html')
     async def post(self):
         data = await self.request.post()
         visitor_id = data['id']
-        visitor = self.app['visitors'].pop(visitor_id, None)
-        if visitor is None:
-            return web.Response(
-                content_type='application/json',
-                text=json.dumps({'error': 'There is no visitor with such id'})
-            )
+        visitor = self.app['visitors'].get(visitor_id, {})
+        if not visitor:
+            return dict(visitor, error='No such visitor')
+        paid = data.get('paid', '')
+        if paid == '':
+            return dict(visitor, error='Please fill \'paid\' field')
+        try:
+            visitor['paid'] = float(paid)
+        except ValueError:
+            return dict(visitor, error='Paid must be float')
+        self.app['visitors'].pop(visitor_id, None)
         visitor.pop('id')
-        visitor['paid'] = float(data['paid'])
         self.app['shift']['left_visitors'].append(visitor)
         self.app['shift']['nominal_cash'] += visitor['paid']
         self.app['shift']['income'] += visitor['paid']
@@ -166,9 +176,16 @@ class CloseShiftView(BaseView):
     async def get(self):
         return {'shift': self.app['shift']}
 
+    @aiohttp_jinja2.template('close_shift.html')
     async def post(self):
         data = await self.request.post()
-        real_cash = float(data['real_cash'])
+        real_cash = data.get('real_cash', '')
+        if real_cash == '':
+            return {'shift': self.app['shift'], 'error': 'Please fill \'real cash\' field'}
+        try:
+            real_cash = float(data['real_cash'])
+        except ValueError:
+            return {'shift': self.app['shift'], 'error': 'Real cash must be float'}
         self.app['shift']['real_cash'] = real_cash
         self.app['shift']['user'] = self.app['user_id']
         self.app['cash'] = real_cash

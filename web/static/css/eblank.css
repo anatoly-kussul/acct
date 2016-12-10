@@ -8,7 +8,7 @@
 }
 
 .page {
-    margin: 0 auto;
+  margin: 10px auto 0;
 }
 
 .modal-container h1 {
@@ -18,13 +18,21 @@
 }
 
 .modal-container input[type=submit] {
-  width: 100%;
-  display: block;
+  width: 49%;
+  /*display: block;*/
   margin-bottom: 10px;
   position: relative;
 }
 
-.modal-container input[type=text], input[type=password] {
+.cancel {
+  width: 49%;
+  /*display: block;*/
+  margin-bottom: 10px;
+  position: relative;
+  float: right;
+}
+
+.modal-container input[type=text], input[type=password], input[type=number] {
   height: 44px;
   font-size: 16px;
   width: 100%;
@@ -39,7 +47,7 @@
   -moz-box-sizing: border-box;
 }
 
-.modal-container input[type=text]:hover, input[type=password]:hover {
+.modal-container input[type=text]:hover, input[type=password]:hover, input[type=number]:hover {
   border: 1px solid #b9b9b9;
   border-top: 1px solid #a0a0a0;
   -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
@@ -79,7 +87,7 @@
   /* background-image: -webkit-gradient(linear, 0 0, 0 100%,   from(#4d90fe), to(#357ae8)); */
 }
 
-.login-error {
+.text-error {
   color: #761c19;
   text-align: center;
   font-size: 14px;

@@ -66,3 +66,23 @@ def termination_handler(signum, frame):
 
 def set_termination_handler():
     signal.signal(signal.SIGTERM, termination_handler)
+
+
+def get_hms(seconds):
+    """
+    Get string in format "%H:%M:%S"
+    :param seconds: float
+    :return: sting
+    """
+    hours = str(int(seconds // 3600))
+    if len(hours) == 1:
+        hours = '0' + hours
+    seconds %= 3600
+    minutes = str(int(seconds // 60))
+    if len(minutes) == 1:
+        minutes = '0' + minutes
+    seconds = str(int(seconds % 60))
+    if len(seconds) == 1:
+        seconds = '0' + seconds
+    result = ':'.join((hours, minutes, seconds))
+    return result

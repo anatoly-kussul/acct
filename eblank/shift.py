@@ -6,9 +6,9 @@ from eblank.models import Shift, Visitor, Discharge, dict_timestamp_to_datetime
 def open_shift(cash=0):
     shift = {
         'nominal_cash': cash,
-        'income': 0,
-        'outcome': 0,
-        'profit': 0,
+        'income': 0.,
+        'outcome': 0.,
+        'profit': 0.,
         'time_opened_timestamp': time.time(),
         'discharges': [],
         'left_visitors': [],
