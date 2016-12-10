@@ -49,6 +49,7 @@ class MainView(BaseView):
             'is_admin': self.app['is_admin'],
             'shift': self.app['shift'],
             'visitors': sorted(self.app['visitors'].values(), key=itemgetter('time_in_timestamp')),
+            'timestamp': time.time(),
         }
 
 
@@ -57,8 +58,9 @@ class LoginView(BaseView):
     async def get(self):
         if self.app.get('username'):
             redirect(self.request, 'main')
-        return {'data': 'Please enter your login'}
+        return {}
 
+    @aiohttp_jinja2.template('login.html')
     async def post(self):
         data = await self.request.post()
         try:
@@ -68,10 +70,7 @@ class LoginView(BaseView):
                 password=hash_password(data['password']),
             )
         except User.DoesNotExist:
-            return web.Response(
-                content_type='application/json',
-                text=json.dumps({'error': 'Wrong username or password'})
-            )
+            return {'error': 'Wrong username or password'}
         self.app['user_id'] = user.id
         self.app['username'] = user.username
         self.app['is_admin'] = user.is_admin

@@ -1,28 +1,37 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Main Page
+    Main Page
 {% endblock %}
 
 {% block head %}
+        <script src="/static/js/timer.js"></script>
 {% endblock %}
 
 {% block content %}
-{{ username }} is on duty<br>
-current cash: {{ shift.nominal_cash }}<br>
-VISITORS {{ visitors|count }}:<br>
-{% for visitor in visitors %}
-<li>{{ visitor.name }} - {{ visitor.time_in_timestamp }} <a href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></li>
-{% endfor %}
-<br><br><br>
-<a href="/add_visitor">Add visitor</a><br>
-<a href="/discharge">Discharge</a><br>
-{% if is_admin %}
-<a href="/sign">Add operator</a><br>
-<a href="/statistics">Statistics</a><br>
-{% endif %}
-<a href="/close_shift">Close shift</a>
+    <div class="container card">
+        <a class="btn btn-primary" href="/add_visitor">Add visitor</a>
+        <a class="btn btn-primary" href="/discharge">Discharge</a>
+        {% if is_admin %}
+            <a class="btn btn-primary" href="/sign">Add operator</a>
+            <a class="btn btn-primary" href="/statistics">Statistics</a>
+        {% endif %}
+        <a class="btn btn-primary" href="/close_shift">Close shift</a>
+        <span class="card">current cash: {{ shift.nominal_cash }}</span>
+        <span class="card"> {{ username }} is on duty</span>
+    </div>
+    <div>
+        <p>VISITORS {{ visitors|count }}:</p>
+        {% for visitor in visitors %}
+            <div class="container">
+                <div class="col-md-3">{{ visitor.name }}</div>
+                <div class="col-md-3"><span class="timer" data-start="{{ timestamp - visitor.time_in_timestamp }}"></span></div>
+                <div class="col-md-3"><a class="btn btn-danger" href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
 
 {% block footer %}
 {% endblock %}
+

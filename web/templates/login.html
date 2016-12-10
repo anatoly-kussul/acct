@@ -5,14 +5,21 @@ Log In
 {% endblock %}
 
 {% block head %}
+    <link href="/static/css/loginform.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<form method="post" action="">
-    <p><input type="text" name="username" value="" placeholder="Username"></p>
-    <p><input type="password" name="password" value="" placeholder="Password"></p>
-    <p><input type="submit" name="commit" value="Log In"></p>
-</form>
+    <div class="login-container card">
+        <h1>E-Blank</h1><br>
+        <form method="post" action="">
+            <p><input type="text" name="username" value="" placeholder="Username"></p>
+            <p><input type="password" name="password" value="" placeholder="Password"></p>
+            <p><input type="submit" class="login login-submit" name="commit" value="Log in"></p>
+        </form>
+    {% if error %}
+        <div class="login-error">{{ error }}</div>
+    {% endif %}
+    </div>
 {% endblock %}
 
 {% block footer %}
