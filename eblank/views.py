@@ -124,7 +124,7 @@ class RemoveVisitorView(BaseView):
             redirect(self.request, 'main')
         visitor['time_out_timestamp'] = time.time()
         visitor['time_delta'] = visitor['time_out_timestamp'] - visitor['time_in_timestamp']
-        visitor['price'] = int(visitor['time_delta'] / 3600 * settings.HOUR_PRICE * 2) / 2
+        visitor['price'] = int(max(visitor['time_delta'] / 3600, 1) * settings.HOUR_PRICE * 2) / 2
         return visitor
 
     async def post(self):
