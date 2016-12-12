@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Add Visitor
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="modal-container card page">
+        <h1>Close shift</h1><br>
+        <form method="post" action="">
+            <p>Nominal Cash <input type="text" name="nominal_cash" value="{{ shift.nominal_cash }}" readonly></p>
+            <p>Income <input type="text" name="income" value="{{ shift.income }}" readonly></p>
+            <p>Outcome <input type="text" name="outcome" value="{{ shift.outcome }}" readonly></p>
+            <p>Profit <input type="text" name="profit" value="{{ shift.profit }}" readonly></p>
+            <p>Real cash <input type="number" name="real_cash" value="" placeholder="Real cash" autocomplete="off"></p>
+            <input type="submit" class="btn btn-primary" name="commit" value="Close shift">
+            <a class="btn btn-danger cancel" href="/">Cancel</a>
+        </form>
+    {% if error %}
+        <div class="text-error">{{ error }}</div>
+    {% endif %}
+    </div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Main Page
+{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="container small-card">
+        <a class="btn btn-primary" href="/">Home</a>
+        <a class="btn btn-primary" href="/statistics">Statistics</a>
+        <span style="float: right" class="btn btn-primary"><i class="fa fa-user-o"></i> {{ username }}</span>
+
+    {# Discharges #}
+    </div>
+        <h3>DISCHARGES {{ discharges|count }}:</h3>
+    <div class="container small-card header">
+        <div class="col-md-4">Time</div>
+        <div class="col-md-4">Amount</div>
+        <div class="col-md-4">Reason</div>
+    </div>
+    {% for discharge in discharges %}
+        <div class="container small-card {{ loop.cycle('odd', 'even') }}">
+            <div class="col-md-4">{{ discharge.timestamp|fromtimestamp }}</div>
+            <div class="col-md-4">{{ discharge.amount }}</div>
+            <div class="col-md-4">{{ discharge.reason }}</div>
+        </div>
+    {% endfor %}
+
+    {# Visitors #}
+    </div>
+        <h3>VISITORS {{ visitors|count }}:</h3>
+    <div class="container small-card header">
+        <div class="col-md-2">Name</div>
+        <div class="col-md-2">Time in</div>
+        <div class="col-md-2">Time out</div>
+        <div class="col-md-2">Time delta</div>
+        <div class="col-md-2">Price</div>
+        <div class="col-md-2">Paid</div>
+    </div>
+    {% for visitor in visitors %}
+        <div class="container small-card {{ loop.cycle('odd', 'even') }}">
+            <div class="col-md-2">{{ visitor.name }}</div>
+            <div class="col-md-2">{{ visitor.time_in_timestamp|fromtimestamp }}</div>
+            <div class="col-md-2">{{ visitor.time_out_timestamp|fromtimestamp }}</div>
+            <div class="col-md-2">{{ (visitor.time_out_timestamp - visitor.time_in_timestamp)|get_hms }}</div>
+            <div class="col-md-2">{{ visitor.price }}</div>
+            <div class="col-md-2">{{ visitor.paid }}</div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
