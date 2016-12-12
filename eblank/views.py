@@ -107,10 +107,12 @@ class AddVisitorView(BaseView):
     async def post(self):
         data = await self.request.post()
         _id = str(uuid.uuid4())
+        timestamp = time.time()
         visitor = {
             'id': _id,
             'name': data['name'],
-            'time_in_timestamp': time.time(),
+            'time_in_timestamp': timestamp,
+            'time_in': datetime.fromtimestamp(timestamp).strftime('%H:%M:%S %d.%m.%Y')
         }
         self.app['visitors'][_id] = visitor
         redirect(self.request, 'main')
@@ -125,10 +127,9 @@ class RemoveVisitorView(BaseView):
         if visitor is None:
             redirect(self.request, 'main')
         visitor['time_out_timestamp'] = time.time()
+        visitor['time_out'] = datetime.fromtimestamp(visitor['time_out_timestamp']).strftime('%H:%M:%S %d.%m.%Y')
         visitor['time_delta'] = visitor['time_out_timestamp'] - visitor['time_in_timestamp']
         visitor['price'] = int(max(visitor['time_delta'] / 3600, 1) * settings.HOUR_PRICE * 2) / 2
-        visitor['time_in'] = datetime.fromtimestamp(visitor['time_in_timestamp']).strftime('%H:%M:%S %d.%m.%Y')
-        visitor['time_out'] = datetime.fromtimestamp(visitor['time_out_timestamp']).strftime('%H:%M:%S %d.%m.%Y')
         visitor['time_delta_str'] = get_hms(visitor['time_delta'])
         return visitor
 

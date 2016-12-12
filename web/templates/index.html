@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container card">
+    <div class="container small-card">
         <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#add-visitor-modal">Add visitor</a>
         <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#discharge-modal">Discharge</a>
         {% if is_admin %}
@@ -17,19 +17,38 @@
             <a class="btn btn-primary" href="/statistics">Statistics</a>
         {% endif %}
         <a class="btn btn-primary" href="/close_shift">Close shift</a>
-        <span class="card">current cash: {{ shift.nominal_cash }}</span>
-        <span class="card"> {{ username }} is on duty</span>
+        <span style="float: right" class="btn btn-primary" href="#" data-toggle="modal" data-target="#current-cash-modal"><i class="fa fa-money"></i></span>
+        <span style="float: right" class="btn btn-primary"><i class="fa fa-user-o"></i> {{ username }}</span>
     </div>
-    <div>
-        <p>VISITORS {{ visitors|count }}:</p>
+    <div style="height: 1px"></div>
+    <div class="container small-card">
+        <h3>VISITORS {{ visitors|count }}:</h3>
+        <div class="container header" style="max-width: 600px">
+            <div class="col-xs-4">Name</div>
+            <div class="col-xs-5">Time in</div>
+            <div class="col-xs-2">Time delta</div>
+            <div class="col-xs-1"></div>
+        </div>
         {% for visitor in visitors %}
-            <div class="container">
-                <div class="col-md-3">{{ visitor.name }}</div>
-                <div class="col-md-3"><span class="timer" data-start="{{ timestamp - visitor.time_in_timestamp }}"></span></div>
-                <div class="col-md-3"><a class="btn btn-danger" href="/remove_visitor?id={{ visitor.id }}">REMOVE</a></div>
+            <div class="container small-card {{ loop.cycle('odd', 'even') }}" style="max-width: 600px">
+                <div class="col-xs-4">{{ visitor.name }}</div>
+                <div class="col-xs-5">{{ visitor.time_in }}</div>
+                <div class="col-xs-2"><span class="timer" data-start="{{ timestamp - visitor.time_in_timestamp }}"></span></div>
+                <div class="col-xs-1"><a href="/remove_visitor?id={{ visitor.id }}"><i class="fa fa-sign-out"></i></a></div>
             </div>
         {% endfor %}
     </div>
+
+    {# Current cash modal #}
+    <div class="modal fade" id="current-cash-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-container card">
+                <h1>Current cash: {{ shift.nominal_cash }} UAH</h1>
+                <span class="btn-danger btn cancel" href="#" data-toggle="modal" data-target="#current-cash-modal">Close</span>
+            </div>
+        </div>
+    </div>
+
 
     {# Add vivitor modal #}
     <div class="modal fade" id="add-visitor-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">

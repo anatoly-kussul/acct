@@ -4,7 +4,7 @@
 function set_timer(timer) {
     var cur_seconds, hours, minutes, seconds;
     var start_seconds = timer.getAttribute('data-start');
-    setInterval(function () {
+    function update_timer () {
         cur_seconds = start_seconds;
         hours = parseInt(cur_seconds / 3600);
         cur_seconds = cur_seconds % 3600;
@@ -21,7 +21,9 @@ function set_timer(timer) {
         }
         timer.innerHTML = hours + ':' + minutes + ':' + seconds;
         start_seconds++;
-    }, 1000);
+    }
+    update_timer();
+    setInterval(update_timer, 1000);
 }
 function init_timers() {
     var timers = document.getElementsByClassName('timer');
