@@ -18,6 +18,8 @@ from eblank.helpers import (
     load_from_shelve,
     clean_up_shelve,
     set_termination_handler,
+    from_timestamp,
+    get_hms,
 )
 
 
@@ -39,6 +41,8 @@ def init_app(db, loop=None):
     app['shift'] = open_shift(cash=app['cash'])
 
     aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(settings.TEMPLATES_PATH))
+    app[aiohttp_jinja2.APP_KEY].filters['fromtimestamp'] = from_timestamp
+    app[aiohttp_jinja2.APP_KEY].filters['get_hms'] = get_hms
     return app
 
 

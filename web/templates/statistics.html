@@ -8,18 +8,35 @@ Main Page
 {% endblock %}
 
 {% block content %}
-SHIFTS {{ shifts|count }}:<br>
-{% for shift in shifts %}
-shift - {{ shift.username }} | {{ shift.nominal_cash }}<br>
-&nbsp;&nbsp;&nbsp;&nbsp; visitors:<br>
-    {% for visitor in shift.visitors_left %}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  visitor - {{ visitor.name }} | {{ visitor.paid }}<br>
+    <div class="container small-card">
+        <a class="btn btn-primary" href="/">Home</a>
+        <span style="float: right" class="btn btn-primary"><i class="fa fa-user-o"></i> {{ username }}</span>
+    </div>
+        <h3>SHIFTS {{ shifts|count }}:</h3>
+    <div class="container small-card header">
+        <div class="col-md-1">Username</div>
+        <div class="col-md-2">Time opened</div>
+        <div class="col-md-2">Time closed</div>
+        <div class="col-md-1">Income</div>
+        <div class="col-md-1">Outcome</div>
+        <div class="col-md-1">Profit</div>
+        <div class="col-md-1">Nominal cash</div>
+        <div class="col-md-2">Real cash</div>
+        <div class="col-md-1">Info</div>
+    </div>
+    {% for shift in shifts %}
+        <div class="container small-card {{ loop.cycle('odd', 'even') }}">
+            <div class="col-md-1">{{ shift.user.username }}</div>
+            <div class="col-md-2">{{ shift.time_opened_timestamp|fromtimestamp }}</div>
+            <div class="col-md-2">{{ shift.time_close_timestamp|fromtimestamp }}</div>
+            <div class="col-md-1">{{ shift.income }}</div>
+            <div class="col-md-1">{{ shift.outcome }}</div>
+            <div class="col-md-1">{{ shift.profit }}</div>
+            <div class="col-md-1">{{ shift.nominal_cash }}</div>
+            <div class="col-md-2">{{ shift.real_cash }}</div>
+            <div class="col-md-1"><a href="/shift_info?id={{ shift.id }}"><i class="fa fa-eye"></i></a></div>
+        </div>
     {% endfor %}
-&nbsp;&nbsp;&nbsp;&nbsp; discharges:<br>
-    {% for discharge in shift.discharges %}
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; discharge - {{ discharge.amount }} {{ discharge.reason }}<br>
-    {% endfor %}
-{% endfor %}
 {% endblock %}
 
 {% block footer %}

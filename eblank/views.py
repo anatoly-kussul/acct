@@ -3,17 +3,16 @@ import time
 import uuid
 from hashlib import md5
 from operator import itemgetter
-from datetime import datetime
 
 import aiohttp_jinja2
 from aiohttp import web
 from peewee import IntegrityError
 
 from eblank import settings
-from eblank.db_getters import get_shifts
+from eblank.db_getters import get_shifts, get_shift_info
 from eblank.models import User
 from eblank.shift import close_shift, open_shift
-from eblank.helpers import get_hms
+from eblank.helpers import get_hms, from_timestamp
 
 
 def redirect(request, router_name):
@@ -112,7 +111,7 @@ class AddVisitorView(BaseView):
             'id': _id,
             'name': data['name'],
             'time_in_timestamp': timestamp,
-            'time_in': datetime.fromtimestamp(timestamp).strftime('%H:%M:%S %d.%m.%Y')
+            'time_in': from_timestamp(timestamp)
         }
         self.app['visitors'][_id] = visitor
         redirect(self.request, 'main')
@@ -127,7 +126,7 @@ class RemoveVisitorView(BaseView):
         if visitor is None:
             redirect(self.request, 'main')
         visitor['time_out_timestamp'] = time.time()
-        visitor['time_out'] = datetime.fromtimestamp(visitor['time_out_timestamp']).strftime('%H:%M:%S %d.%m.%Y')
+        visitor['time_out'] = from_timestamp(visitor['time_out_timestamp'])
         visitor['time_delta'] = visitor['time_out_timestamp'] - visitor['time_in_timestamp']
         visitor['price'] = int(max(visitor['time_delta'] / 3600, 1) * settings.HOUR_PRICE * 2) / 2
         visitor['time_delta_str'] = get_hms(visitor['time_delta'])
@@ -200,4 +199,20 @@ class StaticsView(BaseView):
         if not self.app.get('is_admin'):
             redirect(self.request, 'main')
         shifts = await get_shifts()
-        return {'shifts': shifts}
+        return {
+            'shifts': shifts,
+            'username': self.app['username'],
+        }
+
+
+class ShiftInfoView(BaseView):
+    @aiohttp_jinja2.template('shift_info.html')
+    async def get(self):
+        shift_id = self.request.GET.get('id')
+        if not shift_id:
+            return {
+                'error': 'Please specify shift id'
+            }
+
+        shift_info = await get_shift_info(shift_id)
+        return dict(shift_info, username=self.app['username'])

@@ -7,6 +7,7 @@ from eblank.views import (
     RemoveVisitorView,
     DischargeView,
     StaticsView,
+    ShiftInfoView
 )
 
 routes = [
@@ -18,4 +19,5 @@ routes = [
     ('*', '/remove_visitor', RemoveVisitorView, 'remove_visitor'),
     ('*', '/discharge', DischargeView, 'discharge'),
     ('*', '/statistics', StaticsView, 'statistics'),
+    ('*', '/shift_info', ShiftInfoView, 'shift_info'),
 ]

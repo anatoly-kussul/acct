@@ -4,6 +4,7 @@ import logging
 import glob
 import os
 import signal
+from datetime import datetime
 
 from eblank import settings
 
@@ -86,3 +87,7 @@ def get_hms(seconds):
         seconds = '0' + seconds
     result = ':'.join((hours, minutes, seconds))
     return result
+
+
+def from_timestamp(timestamp):
+    return datetime.fromtimestamp(timestamp).strftime('%H:%M:%S %d.%m.%Y')
