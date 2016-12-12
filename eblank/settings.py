@@ -5,15 +5,7 @@ STATIC_PATH = 'web/static'
 
 # data persistence
 SHELVE_FILENAME = 'current_state.db'
-
-# postgresql settings
-POSTGRES_CONNECTION_SETTINGS = {
-    'database': 'eblank',
-    'user': 'eblank',
-    'password': 'i_am_password',
-    'host': 'postgres',
-    'port': 5432,
-}
+DATABASE_NAME = 'db.sqlite3'
 
 # APP settings
 HOUR_PRICE = 15  # UAH

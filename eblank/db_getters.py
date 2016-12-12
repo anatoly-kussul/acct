@@ -1,11 +1,9 @@
 from datetime import datetime
 
-from peewee_async import execute
-
 from eblank.models import Shift, Discharge, Visitor, User
 
 
-async def get_shifts(start_timestamp=None, end_timestamp=None, user_id=None):
+def get_shifts(start_timestamp=None, end_timestamp=None, user_id=None):
     shifts = []
 
     query = Shift.select(Shift, User).join(User).order_by(Shift.time_opened_timestamp.desc())
@@ -23,7 +21,7 @@ async def get_shifts(start_timestamp=None, end_timestamp=None, user_id=None):
     if expressions:
         query.where(*expressions)
 
-    db_shifts = await execute(query)
+    db_shifts = query
 
     for shift in db_shifts:
         shift_d = shift.to_dict()
@@ -34,13 +32,11 @@ async def get_shifts(start_timestamp=None, end_timestamp=None, user_id=None):
     return shifts
 
 
-async def get_shift_info(shift_id):
-    discharges_query = Discharge.select().where(Discharge.shift == shift_id)
-    db_discharges = await execute(discharges_query)
+def get_shift_info(shift_id):
+    db_discharges = Discharge.select().where(Discharge.shift == shift_id)
     discharges = [discharge.to_dict() for discharge in db_discharges]
 
-    visitors_query = Visitor.select().where(Visitor.shift == shift_id)
-    db_visitors = await execute(visitors_query)
+    db_visitors = Visitor.select().where(Visitor.shift == shift_id)
     visitors = [visitor.to_dict() for visitor in db_visitors]
 
     return {

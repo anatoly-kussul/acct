@@ -12,8 +12,6 @@ pycparser==2.14
 six==1.10.0
 wheel==0.24.0
 peewee==2.8.5
-peewee-async==0.5.6
-aiopg==0.13.0
 pycodestyle==2.0.0
 pyflakes==1.2.3
 pylint==1.6.4

@@ -3,16 +3,11 @@ import logging
 from hashlib import md5
 
 import peewee
-import peewee_async
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
 from eblank import settings
 
-db = peewee_async.PostgresqlDatabase(
-    autocommit=True,
-    autorollback=True,
-    **settings.POSTGRES_CONNECTION_SETTINGS
-)
+db = peewee.SqliteDatabase(settings.DATABASE_NAME, autocommit=True, autorollback=True)
 
 
 def dict_timestamp_to_datetime(data):
@@ -107,6 +102,3 @@ def init_db(drop=False):
         drop_tables()
     create_tables()
     add_fixtures()
-    async_db = peewee_async.Manager(db)
-    async_db.allow_sync = False
-    return async_db

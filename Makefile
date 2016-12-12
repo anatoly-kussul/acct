@@ -2,7 +2,7 @@ build:
 	docker build -f docker/Dockerfile -t eblank:dev .
 
 run:
-	docker-compose -f docker/docker-compose.yml up --remove-orphans
+	docker run -iP -v $(shell pwd):/app eblank:dev python -m eblank.main
 
 test:
 	docker run -iP -v $(shell pwd):/app:ro eblank:dev su -c 'python -m unittest' bob

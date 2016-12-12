@@ -65,8 +65,7 @@ class LoginView(BaseView):
     async def post(self):
         data = await self.request.post()
         try:
-            user = await self.db.get(
-                User,
+            user = User.get(
                 username=data['username'],
                 password=hash_password(data['password']),
             )
@@ -90,7 +89,7 @@ class RegisterView(BaseView):
                 'password': hash_password(data['password']),
                 'is_admin': data.get('is_admin', False)
             }
-            await self.db.create(User, **user_data)
+            await User.create(**user_data)
         except IntegrityError:
             return web.Response(
                 content_type='application/json',
@@ -189,7 +188,7 @@ class CloseShiftView(BaseView):
         self.app['shift']['real_cash'] = real_cash
         self.app['shift']['user'] = self.app['user_id']
         self.app['cash'] = real_cash
-        await close_shift(self.app['shift'], self.db)
+        close_shift(self.app['shift'], self.db)
         logout(self.request)
 
 
@@ -198,7 +197,7 @@ class StaticsView(BaseView):
     async def get(self):
         if not self.app.get('is_admin'):
             redirect(self.request, 'main')
-        shifts = await get_shifts()
+        shifts = get_shifts()
         return {
             'shifts': shifts,
             'username': self.app['username'],
@@ -214,5 +213,5 @@ class ShiftInfoView(BaseView):
                 'error': 'Please specify shift id'
             }
 
-        shift_info = await get_shift_info(shift_id)
+        shift_info = get_shift_info(shift_id)
         return dict(shift_info, username=self.app['username'])

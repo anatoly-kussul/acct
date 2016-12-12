@@ -3,3 +3,4 @@
 *__pycache__*
 current_state.db*
 pylint.svg
+db.sqlite3

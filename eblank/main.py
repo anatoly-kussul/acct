@@ -23,7 +23,7 @@ from eblank.helpers import (
 )
 
 
-def init_app(db, loop=None):
+def init_app(loop=None):
     app = web.Application(
         middlewares=[
             authorize,
@@ -35,7 +35,6 @@ def init_app(db, loop=None):
         app.router.add_route(route[0], route[1], route[2], name=route[3])
     app.router.add_static('/static', settings.STATIC_PATH, name='static')
 
-    app['db'] = db
     app['visitors'] = {}
     app['cash'] = 0
     app['shift'] = open_shift(cash=app['cash'])
@@ -90,8 +89,8 @@ def main():
     loop = asyncio.get_event_loop()
     args = parse_args()
     setup_logging(verbose=args.verbose, silent=args.silent)
-    db = init_db(args.drop)
-    app = init_app(db, loop=loop)
+    init_db(args.drop)
+    app = init_app(loop=loop)
     shelf = init_shelve(args.clean)
     load_from_shelve(app, shelf)
     logging.info('Starting app on port {}...'.format(settings.PORT))
