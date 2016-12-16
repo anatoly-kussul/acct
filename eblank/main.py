@@ -144,7 +144,7 @@ def main():
     load_from_shelve(app, shelf)
     logging.info('Starting app on port {}...'.format(settings.PORT))
     try:
-        run_app(app, port=settings.PORT)
+        run_app(app, port=settings.PORT, host='127.0.0.1')
     finally:
         save_to_shelve(app, shelf)
         logging.info('Stopped.')
