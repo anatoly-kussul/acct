@@ -1,9 +1,5 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Main Page
-{% endblock %}
-
 {% block head %}
         <script src="/static/js/timer.js"></script>
 {% endblock %}
@@ -23,14 +19,14 @@
     <div style="height: 1px"></div>
     <div class="container small-card">
         <h3>VISITORS {{ visitors|count }}:</h3>
-        <div class="container header" style="max-width: 600px">
+        <div class="container header" style="max-width: 700px">
             <div class="col-xs-4">Name</div>
             <div class="col-xs-5">Time in</div>
             <div class="col-xs-2">Time delta</div>
             <div class="col-xs-1"></div>
         </div>
         {% for visitor in visitors %}
-            <div class="container small-card {{ loop.cycle('odd', 'even') }}" style="max-width: 600px">
+            <div class="container small-card {{ loop.cycle('odd', 'even') }}" style="max-width: 700px">
                 <div class="col-xs-4">{{ visitor.name }}</div>
                 <div class="col-xs-5">{{ visitor.time_in }}</div>
                 <div class="col-xs-2"><span class="timer" data-start="{{ timestamp - visitor.time_in_timestamp }}"></span></div>
